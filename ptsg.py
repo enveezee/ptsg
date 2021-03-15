@@ -242,9 +242,6 @@ class SimpleTurtle():
                     ],
                 },
                 'cmdline': {
-                    'change_submits': True,
-                    'do_not_clear': False,
-                    'enable_events': True,
                     'k': '_cmdline_',
                     'size': (82,1),
                 },
@@ -339,39 +336,6 @@ class SimpleTurtle():
         # Set default distance, rotation.
         self.distance = self.window.Element('_distance_').Get()
         self.rotation = self.window.Element('_rotation_').Get()
-
-        # Setup turtle keyboard and mouse events.
-        turtle.onclick(_leftMouse, btn=1)
-        turtle.onclick(_middleMouse, btn=2)
-        turtle.onclick(_rightMouse, btn=3)
-        turtle.onkeypress(_up, key='Up')
-        turtle.onkeypress(_down, key='Down')
-        turtle.onkeypress(_left, key='Left')
-        turtle.onkeypress(_right, key='Right')
-
-
-    # Mouse redirect functions.
-    def _leftMouse(self, x, y):
-        self.mouse(1, x, y)
-
-    def _middleMouse(self, x, y):
-        self.mouse(2, x, y)
-
-    def _rightMouse(self, x, y):
-        self.mouse(3, x, y)
-
-    # Keyboard redirect functions.
-    def _down(self):
-        self.move('d')
-
-    def _left(self):
-        self.move('l')
-
-    def _right(self):
-        self.move('r')
-
-    def _up(self):
-        self.move('u')
 
 
     def checkInt(self, arg):
@@ -491,10 +455,6 @@ class SimpleTurtle():
         self.window.close()
         return
 
-      
-    def mouse(self, x, y):
-        pass
-      
 
     def move(self, cmd):
         '''Move the selected turtle.'''
