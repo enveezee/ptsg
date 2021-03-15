@@ -187,6 +187,8 @@ class SimpleTurtle():
                                 initial_value=480,
                                 k='_canvasHeight_',
                             ),
+                            sg.Button('Clear'),
+                            sg.Button('Home'),
                         ],
                    ],
                 },
@@ -242,8 +244,10 @@ class SimpleTurtle():
                     ],
                 },
                 'cmdline': {
+                    'default_value': '',
+                    'enable_events': True,
                     'k': '_cmdline_',
-                    'size': (82,1),
+                    'size': (80,1),
                 },
                 'console': {
                     'autoscroll': True,
@@ -286,7 +290,11 @@ class SimpleTurtle():
                 controls = [sg.Column(**args['controls'])]
 
             cmdline = [
-                sg.Input(**args['cmdline']), 
+                #sg.Input(**args['cmdline']),
+                sg.Combo(
+                    [],
+                    **args['cmdline'],
+                ),
                 sg.Button('Run', bind_return_key=True)
             ]
 
@@ -356,7 +364,7 @@ class SimpleTurtle():
 
          This could be replaced with something more robust, but for now it does
         basic shorthand of turtle commands.'''
-        tokens = cmd.split(' ')
+        tokens = cmd.strip().split(' ')
         print(f'Running command list:\n{tokens}')
 
         while len(tokens):
@@ -381,8 +389,21 @@ class SimpleTurtle():
                 else:
                     args = []
                     for arg in range(takesArgs):
-                        arg = tokens.pop(0)
-
+                        try:
+                            arg = tokens.pop(0)
+                        except IndexError:
+                            print(
+                                f'turtle.{token} takes {takesArgs} '
+                                f'arguments but {len(args)} were given.'
+                            )
+                            self.cmdlineHistory.append(' '.join(tokens))
+                        if arg in turtle.__all__:
+                            print(
+                                f'turtle.{token} takes {takesArgs} '
+                                f'arguments but {len(args)-1} were given.'
+                            )
+                            tokens.append(arg)
+                            self.cmdlineHistory.append(' '.join(tokens))
                         if ',' in arg:
                             splitArgs = arg.split(',')
                             tupleArgs = []
@@ -415,6 +436,9 @@ class SimpleTurtle():
         '''
         print('PGST initialized.')
 
+        self.cmdlineHistory = []
+        self.window.Element('_cmdline_').Widget.bind('<Key-Return>', self.run)
+
         while True:
             self.turtleStatus(self.turtle)
             event, values = self.window.read()
@@ -423,8 +447,7 @@ class SimpleTurtle():
                 break
 
             elif event == 'Run':
-                self.cmdline(values['_cmdline_'])
-                self.window.Element('_cmdline_').update(value='')
+                self.run()
 
             elif event in [
                 'Forward', 
@@ -451,6 +474,11 @@ class SimpleTurtle():
 
             elif event[0] == '_' and event[-1] == '_':
                 self.widgetEvent(event, values)
+
+            elif event in ['Clear', 'Home',]:
+                turtleCmd = getattr(self.turtle, event.casefold())
+                turtleCmd()
+
 
         self.window.close()
         return
@@ -523,6 +551,16 @@ class SimpleTurtle():
         return self.window.read()
 
 
+    def run(self, *args):
+        cmd = self.window.Element('_cmdline_').Get()
+        self.cmdlineHistory.append(cmd)
+        self.cmdline(cmd)
+        self.window.Element('_cmdline_').update(
+            value='', 
+            values=self.cmdlineHistory,
+        )
+
+
     def selectTurtle(self, name):
         '''Select active turtle by name'''
         self.turtle = self.turtles[name]
@@ -558,6 +596,10 @@ class SimpleTurtle():
                 width=values['_canvasWidth_'], 
                 height=values['_canvasHeight_']
             )
+
+        elif event == 'Return':
+            print(event)
+        
 
 
 if __name__ == '__main__':
