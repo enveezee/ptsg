@@ -13,3 +13,7 @@ Screnshots:
 ![PTSG](ptsg.png?raw=true "PTSG")
 
 ![PTSG run from terminal](ptsg-terminal.png?raw=true "PTSG run from the terminal")
+
+## Instaling requirements
+
+´pip install -r requirements.txt´
